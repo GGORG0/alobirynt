@@ -7,3 +7,7 @@ DEFINE FIELD OVERWRITE correct ON submitted
     VALUE <future> { ->task.answer ?= answer } READONLY;
 
 DEFINE FIELD OVERWRITE timestamp ON submitted TYPE datetime READONLY VALUE time::now();
+
+DEFINE INDEX unique_submits
+    ON TABLE submitted
+    COLUMNS in, out UNIQUE;

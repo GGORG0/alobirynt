@@ -13,3 +13,7 @@ DEFINE FIELD OVERWRITE secret ON discovered TYPE string
     };
 
 DEFINE FIELD OVERWRITE timestamp ON discovered TYPE datetime READONLY VALUE time::now();
+
+DEFINE INDEX unique_discovers
+    ON TABLE discovered
+    COLUMNS in, out UNIQUE;
