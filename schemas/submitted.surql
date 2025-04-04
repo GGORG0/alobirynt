@@ -4,10 +4,14 @@ DEFINE TABLE OVERWRITE submitted SCHEMAFULL TYPE RELATION FROM user TO task ENFO
 
 DEFINE FIELD OVERWRITE answer ON submitted TYPE float;
 DEFINE FIELD OVERWRITE correct ON submitted
-    VALUE <future> { ->task.answer ?= answer } READONLY;
+    VALUE <future> { crypto::argon2::compare(out.answer_hash, <string>answer) } READONLY;
 
 DEFINE FIELD OVERWRITE timestamp ON submitted TYPE datetime READONLY VALUE time::now();
 
-DEFINE INDEX unique_submits
+DEFINE INDEX OVERWRITE unique_submits
     ON TABLE submitted
     COLUMNS in, out UNIQUE;
+
+DEFINE INDEX OVERWRITE answer
+    ON TABLE submitted
+    FIELDS answer;
