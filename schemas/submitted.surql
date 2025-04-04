@@ -4,7 +4,7 @@ DEFINE TABLE OVERWRITE submitted SCHEMAFULL TYPE RELATION FROM user TO task ENFO
 
 DEFINE FIELD OVERWRITE answer ON submitted TYPE float;
 DEFINE FIELD OVERWRITE correct ON submitted
-    VALUE <future> { crypto::argon2::compare(out.answer_hash, <string>answer) } READONLY;
+    VALUE crypto::argon2::compare(out.answer_hash, <string>answer) READONLY;
 
 DEFINE FIELD OVERWRITE timestamp ON submitted TYPE datetime READONLY VALUE time::now();
 
