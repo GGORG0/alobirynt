@@ -1,16 +1,24 @@
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import type { Metadata, Viewport } from 'next';
 
 import './globals.css';
 
+import { fontSans } from '@/lib/fonts';
+import { cn } from '@/lib/utils';
+import { TailwindIndicator } from '@/components/tailwind-indicator';
 import { ThemeProvider } from '@/components/theme-provider';
 
-const inter = Inter({
-  subsets: ['latin'],
-});
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: 'white' },
+    { media: '(prefers-color-scheme: dark)', color: 'black' },
+  ],
+};
 
 export const metadata: Metadata = {
-  title: 'ALObirynt',
+  title: {
+    template: '%s | ALObirynt',
+    default: 'ALObirynt',
+  },
   description: 'Gra matematyczna dni otwartych ALO PWr',
 };
 
@@ -21,7 +29,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pl" suppressHydrationWarning>
-      <body className={`${inter.className} antialiased`}>
+      <body
+        className={cn('min-h-screen font-sans antialiased', fontSans.variable)}
+      >
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -29,6 +39,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
+          <TailwindIndicator />
         </ThemeProvider>
       </body>
     </html>

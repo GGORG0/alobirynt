@@ -120,3 +120,9 @@
     @apply bg-background text-foreground;
   }
 }
+
+@utility container {
+  margin-inline: auto;
+  padding-inline: 2rem;
+  center: true;
+}
