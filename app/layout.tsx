@@ -1,15 +1,17 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
-import { ThemeProvider } from "@/components/theme-provider";
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+
+import './globals.css';
+
+import { ThemeProvider } from '@/components/theme-provider';
 
 const inter = Inter({
-  subsets: ["latin"],
+  subsets: ['latin'],
 });
 
 export const metadata: Metadata = {
-  title: "ALObirynt",
-  description: "Gra matematyczna dni otwartych ALO PWr",
+  title: 'ALObirynt',
+  description: 'Gra matematyczna dni otwartych ALO PWr',
 };
 
 export default function RootLayout({
