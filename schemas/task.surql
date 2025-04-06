@@ -23,7 +23,12 @@ DEFINE FIELD OVERWRITE answer ON task TYPE float
 
 -- public
 DEFINE FIELD OVERWRITE answer_hash ON task
-    VALUE crypto::argon2::generate(<string>answer) READONLY;
+    VALUE crypto::argon2::generate(<string>answer) READONLY
+    PERMISSIONS
+        FOR select WHERE count(<-discovered<-(user WHERE id = $auth)) > 0;
 
 DEFINE FIELD OVERWRITE points_solved ON task TYPE int;
 DEFINE FIELD OVERWRITE points_discovered ON task TYPE int;
+
+DEFINE FIELD OVERWRITE discovered ON task
+    VALUE <future> { count(<-discovered<-(user WHERE id = $auth)) > 0 } READONLY;

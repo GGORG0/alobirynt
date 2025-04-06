@@ -2,11 +2,14 @@ import type { Metadata, Viewport } from 'next';
 
 import './globals.css';
 
+import { Toaster } from 'sonner';
+
 import { fontSans } from '@/lib/fonts';
 import { cn } from '@/lib/utils';
 import DefaultQueryClientProvider from '@/hooks/default-query-client-provider';
 import { SurrealProvider } from '@/hooks/surreal-provider';
 import { SiteHeader } from '@/components/site-header';
+import SurrealErrorBubbler from '@/components/surreal-error-bubbler';
 import { SurrealIndicator } from '@/components/surreal-indicator';
 import { TailwindIndicator } from '@/components/tailwind-indicator';
 import { ThemeProvider } from '@/components/theme-provider';
@@ -57,10 +60,12 @@ export default function RootLayout({
             >
               <div className="relative flex min-h-screen flex-col">
                 <SiteHeader />
-                <div className="flex-1">{children}</div>
+                <main className="flex flex-1">{children}</main>
               </div>
+              <Toaster />
               <TailwindIndicator />
               <SurrealIndicator />
+              <SurrealErrorBubbler />
             </SurrealProvider>
           </DefaultQueryClientProvider>
         </ThemeProvider>
