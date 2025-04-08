@@ -7,10 +7,6 @@ export default interface User {
 
   name: string;
   password: ReadOnly<string>;
-
-  points_discovered: ReadOnly<number>;
-  points_solved: ReadOnly<number>;
-  points: ReadOnly<number>;
 }
 
 export type WriteableUser = Writeable<User>;

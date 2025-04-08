@@ -12,13 +12,7 @@ export default function LoginLayout({
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-8">
-      {isConnecting ? (
-        <Spinner />
-      ) : isSuccess ? (
-        <>{children}</>
-      ) : (
-        <div>error</div> // TODO: add error handling
-      )}
+      {isConnecting ? <Spinner /> : isSuccess && <>{children}</>}
     </div>
   );
 }

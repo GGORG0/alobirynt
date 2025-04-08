@@ -3,7 +3,6 @@ import { Toaster } from 'sonner';
 import DefaultQueryClientProvider from '@/hooks/default-query-client-provider';
 import { SurrealProvider } from '@/hooks/surreal-provider';
 import SiteHeader from '@/components/site-header';
-import SurrealAutoLogin from '@/components/surreal-auto-login';
 import SurrealErrorBubbler from '@/components/surreal-error-bubbler';
 import SurrealIndicator from '@/components/surreal-indicator';
 import TailwindIndicator from '@/components/tailwind-indicator';
@@ -26,6 +25,7 @@ export default function UiLayout({
           reconnect: true,
         }}
         autoConnect
+        autoLogIn
       >
         <SiteHeader />
         <main className="flex flex-1">{children}</main>
@@ -36,7 +36,6 @@ export default function UiLayout({
         <SurrealIndicator />
 
         <SurrealErrorBubbler />
-        <SurrealAutoLogin />
       </SurrealProvider>
     </DefaultQueryClientProvider>
   );

@@ -11,7 +11,11 @@ import { z } from 'zod';
 
 import { Extensible } from '@/lib/models';
 import User from '@/lib/models/user';
-import { useSurrealClient } from '@/hooks/surreal-provider';
+import {
+  LOGIN_INFO_LOCALSTORAGE_KEY,
+  SavedLoginInfo,
+  useSurrealClient,
+} from '@/hooks/surreal-provider';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -23,10 +27,6 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
-import {
-  LOGIN_INFO_LOCALSTORAGE_KEY,
-  SavedLoginInfo,
-} from '@/components/surreal-auto-login';
 
 const formSchema = z.object({
   username: z
@@ -118,7 +118,9 @@ export default function LoginPage() {
       } catch (err) {
         // TODO: allow account transfer
         console.error('Error during signup:', err);
-        toast.error('Nie udało się zalogować');
+        toast.error('Nie udało się zalogować', {
+          description: 'Spróbuj użyć innej nazwy użytkownika',
+        });
       }
     },
     [surreal, setLoginInfo, router]
