@@ -10,7 +10,7 @@ DEFINE FIELD OVERWRITE content ON task TYPE string
 
 -- private
 DEFINE FIELD OVERWRITE secret ON task TYPE string
-    VALUE rand::string() READONLY
+    VALUE rand::string(8) READONLY
     PERMISSIONS NONE;
 
 -- public

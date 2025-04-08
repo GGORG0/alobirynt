@@ -17,7 +17,7 @@ DEFINE FIELD OVERWRITE name ON user TYPE string
     };
 
 DEFINE FIELD OVERWRITE password ON user TYPE string
-    VALUE rand::string() READONLY;
+    VALUE rand::string(12) READONLY;
 
 DEFINE INDEX OVERWRITE name ON user FIELDS name UNIQUE;
 
