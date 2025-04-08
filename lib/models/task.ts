@@ -6,11 +6,15 @@ interface DiscoveredTask {
   id: ReadOnly<RecordId>;
   name: string;
   content: string;
+
   secret_hash: ReadOnly<string>;
   answer_hash: ReadOnly<string>;
+
   points_solved: number;
   points_discovered: number;
+
   discovered: ReadOnly<true>;
+  solved: ReadOnly<boolean>;
 }
 
 type NonDiscoveredTask = Omit<

@@ -32,3 +32,6 @@ DEFINE FIELD OVERWRITE points_discovered ON task TYPE int;
 
 DEFINE FIELD OVERWRITE discovered ON task
     VALUE <future> { count(<-discovered<-(user WHERE id = $auth)) > 0 } READONLY;
+
+DEFINE FIELD OVERWRITE solved ON task
+    VALUE <future> { count(<-(submitted WHERE correct = true)<-(user WHERE id = $auth)) > 0 } READONLY;

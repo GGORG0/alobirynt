@@ -15,3 +15,7 @@ DEFINE INDEX OVERWRITE unique_submits
 DEFINE INDEX OVERWRITE answer
     ON TABLE submitted
     FIELDS answer;
+
+DEFINE INDEX OVERWRITE correct
+    ON TABLE submitted
+    FIELDS correct;
