@@ -2,7 +2,7 @@ import { RecordId } from 'surrealdb';
 
 import { ReadOnly, Writeable } from '.';
 
-interface DiscoveredTask {
+export interface DiscoveredTask {
   id: ReadOnly<RecordId>;
   name: string;
   content: string;
@@ -18,7 +18,7 @@ interface DiscoveredTask {
   answered: ReadOnly<boolean>;
 }
 
-type NonDiscoveredTask = Omit<
+export type NonDiscoveredTask = Omit<
   DiscoveredTask,
   'content' | 'answer_hash' | 'discovered'
 > & {
@@ -27,5 +27,9 @@ type NonDiscoveredTask = Omit<
 
 type Task = DiscoveredTask | NonDiscoveredTask;
 export default Task;
+
+export function isDiscovered(task: Task): task is DiscoveredTask {
+  return task.discovered === true;
+}
 
 export type WriteableTask = Writeable<Task>;

@@ -17,12 +17,12 @@ export default function Home() {
 
     const fetchTasks = async () => {
       try {
-        const res = (
+        const fetchedTasks = (
           await surreal.query<Extensible<Task>[][]>(
             'SELECT * FROM task ORDER BY name'
           )
         )[0];
-        setTasks(res);
+        setTasks(fetchedTasks);
       } catch (err) {
         console.error('Failed to fetch tasks:', err);
         toast.error('Nie udało się pobrać zadań');

@@ -1,5 +1,14 @@
+import { useRouter } from 'next/navigation';
 import { cva } from 'class-variance-authority';
-import { Check, LockKeyhole, LockOpen, LucideProps, X } from 'lucide-react';
+import {
+  Check,
+  CheckCheck,
+  LockKeyhole,
+  LockOpen,
+  LucideProps,
+  Search,
+  X,
+} from 'lucide-react';
 
 import Task from '@/lib/models/task';
 import { cn } from '@/lib/utils';
@@ -14,7 +23,6 @@ import { Badge } from './ui/badge';
 
 export interface TaskCardProps {
   task: Omit<Task, 'content' | 'answer_hash' | 'secret_hash'>;
-  onClick?: () => void;
 }
 
 const badgeVariants = cva('absolute top-0 right-0 mr-6 size-10 rounded-full', {
@@ -28,7 +36,9 @@ const badgeVariants = cva('absolute top-0 right-0 mr-6 size-10 rounded-full', {
   },
 });
 
-export default function TaskCard({ task, onClick }: TaskCardProps) {
+export default function TaskCard({ task }: TaskCardProps) {
+  const router = useRouter();
+
   const badgeVariant = task.discovered
     ? task.answered
       ? task.solved
@@ -42,15 +52,26 @@ export default function TaskCard({ task, onClick }: TaskCardProps) {
   };
 
   return (
-    <Card onClick={onClick} className={cn(onClick && 'cursor-pointer')}>
+    <Card
+      onClick={
+        task.discovered
+          ? () => {
+              router.push(`/${task.id.id.toString()}`);
+            }
+          : undefined
+      }
+      className={cn(task.discovered && 'cursor-pointer')}
+    >
       <CardHeader className="relative">
         <CardTitle>{task.name}</CardTitle>
         <CardDescription className="mt-1 flex flex-row gap-2">
-          <Badge variant="secondary">
-            {task.points_discovered} pkt za znalezienie
+          <Badge variant={task.discovered ? 'default' : 'secondary'}>
+            <Search />
+            {task.points_discovered} pkt
           </Badge>
-          <Badge variant="secondary">
-            {task.points_solved} pkt za rozwiązanie
+          <Badge variant={task.solved ? 'default' : 'secondary'}>
+            <CheckCheck />
+            {task.points_solved} pkt
           </Badge>
         </CardDescription>
 
