@@ -15,6 +15,7 @@ interface DiscoveredTask {
 
   discovered: ReadOnly<true>;
   solved: ReadOnly<boolean>;
+  answered: ReadOnly<boolean>;
 }
 
 type NonDiscoveredTask = Omit<

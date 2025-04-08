@@ -35,3 +35,6 @@ DEFINE FIELD OVERWRITE discovered ON task
 
 DEFINE FIELD OVERWRITE solved ON task
     VALUE <future> { count(<-(submitted WHERE correct = true)<-(user WHERE id = $auth)) > 0 } READONLY;
+
+DEFINE FIELD OVERWRITE answered ON task
+    VALUE <future> { count(<-submitted<-(user WHERE id = $auth)) > 0 } READONLY;

@@ -28,7 +28,7 @@ export default function UiLayout({
         autoLogIn
       >
         <SiteHeader />
-        <main className="flex flex-1">{children}</main>
+        <main className="flex flex-1 flex-col">{children}</main>
 
         <Toaster />
 
