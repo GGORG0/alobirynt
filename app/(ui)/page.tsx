@@ -17,7 +17,11 @@ export default function Home() {
 
     const fetchTasks = async () => {
       try {
-        const res = await surreal.select<Extensible<Task>>('task');
+        const res = (
+          await surreal.query<Extensible<Task>[][]>(
+            'SELECT * FROM task ORDER BY name'
+          )
+        )[0];
         setTasks(res);
       } catch (err) {
         console.error('Failed to fetch tasks:', err);

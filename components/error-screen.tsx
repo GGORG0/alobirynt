@@ -29,6 +29,8 @@ export default function ErrorScreen({
   }, [error]);
 
   useEffect(() => {
+    if (process.env.NODE_ENV !== 'production') return;
+
     const timer = setTimeout(reset, 2000);
 
     return () => clearTimeout(timer);
