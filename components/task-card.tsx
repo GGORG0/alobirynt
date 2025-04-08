@@ -28,7 +28,7 @@ export interface TaskCardProps {
 const badgeVariants = cva('absolute top-0 right-0 mr-6 size-10 rounded-full', {
   variants: {
     variant: {
-      correct: 'bg-green-800 text-foreground [a&]:hover:bg-green-800/90',
+      correct: 'bg-green-700 text-white [a&]:hover:bg-green-700/90', // TODO: maybe make the color better adjust to light/dark mode
       incorrect: '',
       unanswered: '',
       undiscovered: '',

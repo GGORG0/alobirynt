@@ -103,6 +103,7 @@ export default function TaskPage({
       )}
       {!task && !error && (
         <div className="flex flex-1 items-center justify-center">
+          {/* TODO: maybe replace this with a skeleton */}
           <Spinner />
         </div>
       )}
