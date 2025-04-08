@@ -7,3 +7,7 @@ type IsReadOnly<T> = [T] extends [{ [__readonlyMarker]?: true }] ? true : false;
 export type Writeable<T> = {
   [K in keyof T as IsReadOnly<T[K]> extends true ? never : K]: T[K];
 };
+
+export type Extensible<T> = T & {
+  [key: string]: unknown;
+};

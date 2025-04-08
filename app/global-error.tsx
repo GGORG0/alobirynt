@@ -1,18 +1,13 @@
 'use client';
 
 import type { Metadata, Viewport } from 'next';
-import Image from 'next/image';
 
 import './globals.css';
 
-import { useEffect } from 'react';
-import { RotateCw } from 'lucide-react';
-
-import { fontMono, fontSans } from '@/lib/fonts';
+import { fontSans } from '@/lib/fonts';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
-import { ThemeProvider } from '@/components/theme-provider';
-import logo from '@/app/icon.svg';
+import ErrorScreen from '@/components/error-screen';
+import ThemeProvider from '@/components/theme-provider';
 
 export const viewport: Viewport = {
   themeColor: [
@@ -33,10 +28,6 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  useEffect(() => {
-    console.error(error);
-  }, [error]);
-
   return (
     <html lang="pl" suppressHydrationWarning>
       <body
@@ -48,20 +39,7 @@ export default function GlobalError({
           enableSystem
           disableTransitionOnChange
         >
-          <div className="flex min-h-screen flex-col items-center justify-center gap-5">
-            <div className="flex items-center space-x-2">
-              <Image src={logo} width={64} height={64} alt="Logo ALO" />
-              <span className="inline-block font-bold">ALObirynt</span>
-            </div>
-            <h2>Coś poszło nie tak!</h2>
-            <Button onClick={() => reset()}>
-              <RotateCw />
-              Spróbuj ponownie
-            </Button>
-            <code className={cn('text-center font-mono', fontMono.variable)}>
-              {JSON.stringify(error, null, 2)}
-            </code>
-          </div>
+          <ErrorScreen error={error} reset={reset} fullscreen showLogo />
         </ThemeProvider>
       </body>
     </html>

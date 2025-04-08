@@ -2,12 +2,13 @@
 
 import { usePathname } from 'next/navigation';
 
-import { ThemeToggle } from '@/components/theme-toggle';
+import ThemeToggle from '@/components/theme-toggle';
 
 import { MainNav, NavItem } from './main-nav';
 
 const navItems: { admin: NavItem[]; public: NavItem[] } = {
   admin: [
+    { title: 'Główna', href: '/' },
     { title: 'Zadania', href: '/admin' },
     { title: 'Uczestnicy', href: '/admin/users' },
   ],
@@ -17,7 +18,7 @@ const navItems: { admin: NavItem[]; public: NavItem[] } = {
   ],
 };
 
-export function SiteHeader() {
+export default function SiteHeader() {
   const pathname = usePathname();
 
   const isAdmin = pathname.startsWith('/admin');

@@ -2,7 +2,7 @@
 
 import { useSurreal } from '@/hooks/surreal-provider';
 
-export function SurrealIndicator() {
+export default function SurrealIndicator() {
   if (process.env.NODE_ENV === 'production') return null;
 
   // eslint-disable-next-line react-hooks/rules-of-hooks

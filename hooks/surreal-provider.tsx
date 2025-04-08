@@ -118,6 +118,7 @@ export function useSurreal() {
  * Access the Surreal client from the context.
  */
 export function useSurrealClient() {
-  const { client } = useSurreal();
+  const { client, isSuccess } = useSurreal();
+  if (!isSuccess) return null;
   return client;
 }

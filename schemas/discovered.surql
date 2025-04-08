@@ -8,7 +8,7 @@ DEFINE FIELD OVERWRITE secret ON discovered TYPE string
         IF crypto::argon2::compare($this.out.secret_hash, $value) {
             RETURN true
         } ELSE {
-            THROW "Invalid secret!"
+            THROW "Niepoprawny sekret!"
         }
     };
 

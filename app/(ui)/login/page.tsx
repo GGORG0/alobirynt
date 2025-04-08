@@ -6,8 +6,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { SendHorizontal } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+import { useLocalStorage } from 'usehooks-ts';
 import { z } from 'zod';
 
+import { Extensible } from '@/lib/models';
 import User from '@/lib/models/user';
 import { useSurrealClient } from '@/hooks/surreal-provider';
 import { Button } from '@/components/ui/button';
@@ -21,12 +23,20 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
+import {
+  LOGIN_INFO_LOCALSTORAGE_KEY,
+  SavedLoginInfo,
+} from '@/components/surreal-auto-login';
 
 const formSchema = z.object({
   username: z
     .string()
     .min(3, 'Nazwa użytkownika musi mieć co najmniej 3 znaki')
-    .max(20, 'Nazwa użytkownika nie może mieć więcej niż 20 znaków'),
+    .max(20, 'Nazwa użytkownika nie może mieć więcej niż 20 znaków')
+    .regex(
+      /^[a-zA-Z0-9]+$/,
+      'Nazwa użytkownika może zawierać tylko litery i cyfry'
+    ),
 });
 
 export default function LoginPage() {
@@ -35,7 +45,13 @@ export default function LoginPage() {
 
   const [isQuerying, setIsQuerying] = useState(true);
 
+  const [, setLoginInfo] = useLocalStorage<SavedLoginInfo | null>(
+    LOGIN_INFO_LOCALSTORAGE_KEY,
+    null
+  );
+
   useEffect(() => {
+    if (!surreal) return;
     const detectLoggedIn = async () => {
       try {
         const user = await surreal.info();
@@ -63,6 +79,11 @@ export default function LoginPage() {
   const onSubmit = useCallback(
     async (data: z.infer<typeof formSchema>) => {
       console.log('Form submitted:', data);
+      if (!surreal) {
+        console.error('Surreal client is not initialized');
+        toast.error('Nie udało się zalogować: brak połączenia z bazą danych');
+        return;
+      }
 
       try {
         const token = await surreal.signup({
@@ -78,17 +99,29 @@ export default function LoginPage() {
         await surreal.authenticate(token);
         console.log('Authenticated successfully');
 
-        const user = await surreal.info<User>();
-        console.log('User info:', user);
+        const user = await surreal.info<Extensible<User>>();
 
+        if (!user) {
+          console.error('User info is null');
+          toast.error('Nie udało się zalogować');
+          return;
+        }
+
+        setLoginInfo({
+          username: user.name,
+          password: user.password,
+        });
+
+        console.log('Logged in successfully as:', user);
         toast(`Zalogowano pomyślnie jako ${user.name}`);
         router.replace('/');
       } catch (err) {
+        // TODO: allow account transfer
         console.error('Error during signup:', err);
         toast.error('Nie udało się zalogować');
       }
     },
-    [surreal, router]
+    [surreal, setLoginInfo, router]
   );
 
   if (isQuerying) {
