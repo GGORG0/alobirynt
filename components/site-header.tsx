@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import ThemeToggle from '@/components/theme-toggle';
 
 import { MainNav, NavItem } from './main-nav';
+import ProfileMenu from './profile-menu';
 
 const navItems: { admin: NavItem[]; public: NavItem[] } = {
   admin: [
@@ -12,10 +13,7 @@ const navItems: { admin: NavItem[]; public: NavItem[] } = {
     { title: 'Zadania', href: '/admin' },
     { title: 'Uczestnicy', href: '/admin/users' },
   ],
-  public: [
-    { title: 'Zadania', href: '/' },
-    { title: 'Admin', href: '/admin' },
-  ],
+  public: [{ title: 'Zadania', href: '/' }],
 };
 
 export default function SiteHeader() {
@@ -30,7 +28,8 @@ export default function SiteHeader() {
       <div className="container flex h-16 items-center space-x-4 sm:justify-between sm:space-x-0">
         <MainNav items={items} admin={isAdmin} />
         <div className="flex flex-1 items-center justify-end space-x-4">
-          <nav className="flex items-center space-x-1">
+          <nav className="flex items-center space-x-2">
+            <ProfileMenu />
             <ThemeToggle />
           </nav>
         </div>

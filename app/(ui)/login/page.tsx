@@ -121,7 +121,7 @@ export default function LoginPage() {
         });
 
         console.log('Logged in successfully as:', user);
-        toast(`Zalogowano pomyślnie jako ${user.name}`);
+        toast.success(`Zalogowano pomyślnie jako ${user.name}`);
         router.replace(nextUrl);
       } catch (err) {
         // TODO: allow account transfer
