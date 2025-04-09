@@ -157,18 +157,28 @@ export default function TaskPage({
       try {
         const taskRecordId = new RecordId('task', taskId);
 
-        const result = (
-          await surreal.query<Submitted[]>(
-            'RELATE $auth->submitted->$task SET answer = $answer',
+        await surreal.query<Submitted[]>(
+          'RELATE $auth->submitted->$task SET answer = $answer',
+          {
+            task: taskRecordId,
+            answer: data.answer,
+          }
+        );
+
+        const submitted = (
+          await surreal.query<Submitted[][]>(
+            'SELECT * FROM $auth->submitted WHERE out = $task',
             {
               task: taskRecordId,
-              answer: data.answer,
             }
           )
-        )[0];
+        )[0][0];
 
-        if (result) {
-          if (result.correct) {
+        console.log('Submitted answer:', submitted);
+
+        if (submitted) {
+          setPreviousAnswer(submitted);
+          if (submitted.correct) {
             toast.success(
               `Poprawna odpowiedź! Otrzymujesz ${task?.points_solved} pkt.`
             );
@@ -207,16 +217,17 @@ export default function TaskPage({
                 <span>
                   Twoja odpowiedź była{' '}
                   <strong>{!task.solved && 'nie'}poprawna</strong>. Nie możesz
-                  zmienić swojej odpowiedzi.
+                  już jej zmienić.
                 </span>
                 {previousAnswer && (
                   <div>
-                    Twoja odpowiedź:{' '}
+                    Odpowiedziałeś:{' '}
                     <strong>{previousAnswer.answer || 'Ładowanie...'}</strong>,{' '}
                     przesłana:{' '}
                     <strong>
                       {previousAnswer.timestamp.toLocaleString('pl-PL')}
                     </strong>
+                    .
                   </div>
                 )}
               </AlertDescription>
@@ -260,7 +271,11 @@ export default function TaskPage({
               />
               <Button
                 type="submit"
-                disabled={form.formState.isSubmitting || task.answered}
+                disabled={
+                  form.formState.isSubmitting ||
+                  task.answered ||
+                  previousAnswer !== null
+                }
               >
                 Wyślij odpowiedź
                 <span className="ml-1">
