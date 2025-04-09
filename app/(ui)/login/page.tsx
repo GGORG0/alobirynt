@@ -14,7 +14,7 @@ import User from '@/lib/models/user';
 import {
   LOGIN_INFO_LOCALSTORAGE_KEY,
   SavedLoginInfo,
-  useSurrealClient,
+  useSurreal,
 } from '@/hooks/surreal-provider';
 import { Button } from '@/components/ui/button';
 import {
@@ -41,7 +41,7 @@ const formSchema = z.object({
 
 export default function LoginPage() {
   const router = useRouter();
-  const surreal = useSurrealClient();
+  const { client: surreal, isSuccess, isLoggedIn } = useSurreal();
 
   const [isQuerying, setIsQuerying] = useState(true);
 
@@ -51,13 +51,18 @@ export default function LoginPage() {
   );
 
   useEffect(() => {
-    if (!surreal) return;
+    if (!isSuccess || !surreal) return;
+
+    if (isLoggedIn) {
+      console.log('User is already logged in!');
+      router.replace('/');
+    }
+
     const detectLoggedIn = async () => {
       try {
         const user = await surreal.info();
 
         console.log('User is already logged in:', user);
-
         router.replace('/');
       } catch (err) {
         console.log('User is not logged in:', err);
@@ -67,7 +72,7 @@ export default function LoginPage() {
     };
 
     detectLoggedIn();
-  }, [surreal, router]);
+  }, [surreal, router, isSuccess, isLoggedIn]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -79,7 +84,7 @@ export default function LoginPage() {
   const onSubmit = useCallback(
     async (data: z.infer<typeof formSchema>) => {
       console.log('Form submitted:', data);
-      if (!surreal) {
+      if (!isSuccess || !surreal) {
         console.error('Surreal client is not initialized');
         toast.error('Nie udało się zalogować: brak połączenia z bazą danych');
         return;
@@ -123,7 +128,7 @@ export default function LoginPage() {
         });
       }
     },
-    [surreal, setLoginInfo, router]
+    [isSuccess, surreal, setLoginInfo, router]
   );
 
   if (isQuerying) {
