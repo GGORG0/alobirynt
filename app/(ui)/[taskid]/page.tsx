@@ -261,11 +261,11 @@ export default function TaskPage({
                         {...field}
                       />
                     </FormControl>
+                    <FormMessage />
                     <FormDescription>
                       Podaj odpowiedź w formie liczby całkowitej lub ułamka
                       dziesiętnego. Masz tylko jedną próbę.
                     </FormDescription>
-                    <FormMessage />
                   </FormItem>
                 )}
               />

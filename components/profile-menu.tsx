@@ -104,7 +104,7 @@ export default function ProfileMenu() {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="icon" onClick={() => {}}>
+        <Button variant="outline" size="icon">
           <UserIcon />
           <span className="sr-only">Profil</span>
         </Button>

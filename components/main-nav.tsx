@@ -1,6 +1,7 @@
 import * as React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { ShieldUser } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import logo from '@/app/icon.svg';
@@ -15,11 +16,11 @@ export function MainNav({ items, admin }: MainNavProps) {
     <div className="flex gap-6 md:gap-10">
       <Link href="/" className="flex items-center space-x-2">
         <Image src={logo} width={36} height={36} alt="Logo ALO" />
-        <span className="inline-block font-bold">
+        <span className="inline-flex gap-1 font-bold">
           ALObirynt
           {admin && (
-            <span className="text-muted-foreground ml-1 text-sm font-normal">
-              Admin
+            <span className="text-muted-foreground">
+              <ShieldUser />
             </span>
           )}
         </span>

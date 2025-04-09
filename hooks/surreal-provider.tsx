@@ -26,8 +26,10 @@ interface SurrealProviderProps {
   params?: Parameters<Surreal['connect']>[1];
   /** Auto connect on component mount, defaults to true */
   autoConnect?: boolean;
-  /** Automatically try to log in on connection success, defaults to true */
+  /** Automatically try to log in as a user on connection success, defaults to false */
   autoLogIn?: boolean;
+  /** Automatically try to log in as an administrator on connection success, defaults to false */
+  adminAutoLogIn?: boolean;
 }
 
 interface SurrealProviderState {
@@ -59,7 +61,8 @@ export function SurrealProvider({
   endpoint,
   params,
   autoConnect = true,
-  autoLogIn = true,
+  autoLogIn = false,
+  adminAutoLogIn = false,
 }: SurrealProviderProps) {
   // Surreal instance remains stable across re-renders
   const [surrealInstance] = useState(() => client ?? new Surreal());
@@ -69,7 +72,9 @@ export function SurrealProvider({
 
   // Store the login info in local storage
   const [loginInfo] = useLocalStorage<SavedLoginInfo | null>(
-    LOGIN_INFO_LOCALSTORAGE_KEY,
+    adminAutoLogIn
+      ? ADMIN_LOGIN_INFO_LOCALSTORAGE_KEY
+      : LOGIN_INFO_LOCALSTORAGE_KEY,
     null
   );
 
@@ -80,6 +85,7 @@ export function SurrealProvider({
   const pathname = usePathname();
   const loginUrl = useMemo(() => {
     if (pathname === '/login') return null;
+    else if (pathname.startsWith('/admin')) return '/admin/login';
 
     const encodedUrl = encodeURIComponent(pathname);
 
@@ -118,46 +124,65 @@ export function SurrealProvider({
 
   // Auto-login on connection success (if enabled)
   useEffect(() => {
-    if (!autoLogIn || !isSuccess || !surrealInstance || isLoggedIn || !loginUrl)
+    if (
+      !(autoLogIn || adminAutoLogIn) ||
+      !isSuccess ||
+      !surrealInstance ||
+      isLoggedIn
+    )
       return;
 
     if (!loginInfo) {
       setIsLoggedIn(false);
-      router.push(loginUrl);
+      if (loginUrl) {
+        router.push(loginUrl);
+      }
       return;
     }
 
     const autoLogin = async () => {
       try {
-        const token = await surrealInstance.signin({
-          namespace: process.env.NEXT_PUBLIC_SURREALDB_NAMESPACE,
-          database: process.env.NEXT_PUBLIC_SURREALDB_DATABASE,
-          access: 'user',
-          variables: {
-            name: loginInfo.username,
+        if (autoLogIn) {
+          await surrealInstance.signin({
+            namespace: process.env.NEXT_PUBLIC_SURREALDB_NAMESPACE,
+            database: process.env.NEXT_PUBLIC_SURREALDB_DATABASE,
+            access: 'user',
+            variables: {
+              name: loginInfo.username,
+              password: loginInfo.password,
+            },
+          });
+
+          const user = await surrealInstance.info<Extensible<User>>();
+
+          if (!user) {
+            console.error('Auto login failed: user info is null');
+            return;
+          }
+
+          console.log('Automatically logged in as:', user);
+        } else if (adminAutoLogIn) {
+          await surrealInstance.signin({
+            namespace: process.env.NEXT_PUBLIC_SURREALDB_NAMESPACE,
+            username: loginInfo.username,
             password: loginInfo.password,
-          },
-        });
+          });
 
-        await surrealInstance.authenticate(token);
-        const user = await surrealInstance.info<Extensible<User>>();
-
-        if (!user) {
-          console.error('Auto login failed: user info is null');
-          return;
+          console.log('Automatically logged in as an administrator');
         }
-
-        console.log('Automatically logged in as:', user);
         setIsLoggedIn(true);
       } catch (err) {
         setIsLoggedIn(false);
         console.error('Auto login failed:', err);
-        router.push(loginUrl);
+        if (loginUrl) {
+          router.push(loginUrl);
+        }
       }
     };
 
     autoLogin();
   }, [
+    adminAutoLogIn,
     autoLogIn,
     isLoggedIn,
     isSuccess,
@@ -231,3 +256,4 @@ export interface SavedLoginInfo {
 }
 
 export const LOGIN_INFO_LOCALSTORAGE_KEY = 'loginInfo';
+export const ADMIN_LOGIN_INFO_LOCALSTORAGE_KEY = 'adminLoginInfo';

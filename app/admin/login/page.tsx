@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { SendHorizontal } from 'lucide-react';
 import { useForm } from 'react-hook-form';
@@ -9,10 +9,8 @@ import { toast } from 'sonner';
 import { useLocalStorage } from 'usehooks-ts';
 import { z } from 'zod';
 
-import { Extensible } from '@/lib/models';
-import User from '@/lib/models/user';
 import {
-  LOGIN_INFO_LOCALSTORAGE_KEY,
+  ADMIN_LOGIN_INFO_LOCALSTORAGE_KEY,
   SavedLoginInfo,
   useSurreal,
 } from '@/hooks/surreal-provider';
@@ -20,7 +18,6 @@ import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -30,27 +27,19 @@ import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
 
 const formSchema = z.object({
-  username: z
-    .string()
-    .min(3, 'Nazwa użytkownika musi mieć co najmniej 3 znaki')
-    .max(20, 'Nazwa użytkownika nie może mieć więcej niż 20 znaków')
-    .regex(
-      /^[a-zA-Z0-9]+$/,
-      'Nazwa użytkownika może zawierać tylko litery i cyfry'
-    ),
+  username: z.string(),
+  password: z.string(),
 });
 
-export default function LoginPage() {
+export default function AdminLoginPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const nextUrl = searchParams.get('next') || '/';
 
   const { client: surreal, isSuccess, isLoggedIn } = useSurreal();
 
   const [isQuerying, setIsQuerying] = useState(true);
 
   const [, setLoginInfo] = useLocalStorage<SavedLoginInfo | null>(
-    LOGIN_INFO_LOCALSTORAGE_KEY,
+    ADMIN_LOGIN_INFO_LOCALSTORAGE_KEY,
     null
   );
 
@@ -59,7 +48,7 @@ export default function LoginPage() {
 
     if (isLoggedIn) {
       console.log('User is already logged in!');
-      router.replace(nextUrl);
+      router.replace('/admin');
     }
 
     const detectLoggedIn = async () => {
@@ -67,7 +56,7 @@ export default function LoginPage() {
         const user = await surreal.info();
 
         console.log('User is already logged in:', user);
-        router.replace(nextUrl);
+        router.replace('/admin');
       } catch (err) {
         console.log('User is not logged in:', err);
 
@@ -76,12 +65,13 @@ export default function LoginPage() {
     };
 
     detectLoggedIn();
-  }, [surreal, router, isSuccess, isLoggedIn, nextUrl]);
+  }, [surreal, router, isSuccess, isLoggedIn]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       username: '',
+      password: '',
     },
   });
 
@@ -95,41 +85,26 @@ export default function LoginPage() {
       }
 
       try {
-        await surreal.signup({
+        await surreal.signin({
           namespace: process.env.NEXT_PUBLIC_SURREALDB_NAMESPACE,
-          database: process.env.NEXT_PUBLIC_SURREALDB_DATABASE,
-          access: 'user',
-          variables: {
-            name: data.username,
-          },
+          username: data.username,
+          password: data.password,
         });
-        console.log('Authenticated successfully');
-
-        const user = await surreal.info<Extensible<User>>();
-
-        if (!user) {
-          console.error('User info is null');
-          toast.error('Nie udało się zalogować');
-          return;
-        }
 
         setLoginInfo({
-          username: user.name,
-          password: user.password,
+          username: data.username,
+          password: data.password,
         });
 
-        console.log('Logged in successfully as:', user);
-        toast.success(`Zalogowano pomyślnie jako ${user.name}`);
-        router.replace(nextUrl);
+        console.log('Logged in successfully');
+        toast.success(`Zalogowano pomyślnie`);
+        router.replace('/admin');
       } catch (err) {
-        // TODO: allow account transfer
-        console.error('Error during signup:', err);
-        toast.error('Nie udało się zalogować', {
-          description: 'Spróbuj użyć innej nazwy użytkownika',
-        });
+        console.error('Error during signin:', err);
+        toast.error('Nie udało się zalogować');
       }
     },
-    [isSuccess, surreal, setLoginInfo, router, nextUrl]
+    [isSuccess, surreal, setLoginInfo, router]
   );
 
   if (isQuerying) {
@@ -138,7 +113,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-8">
-      <h1 className="text-2xl">Zaloguj się</h1>
+      <h1 className="text-2xl">Zaloguj się do panelu administratora</h1>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -154,15 +129,19 @@ export default function LoginPage() {
                   <Input {...field} />
                 </FormControl>
                 <FormMessage />
-                <FormDescription>
-                  Wybierz nazwę użytkownika, a konto zostanie utworzone
-                  automatycznie. Nie potrzebujemy żadnych innych danych o Tobie
-                  (nawet hasła!), a nazwa użytkownika będzie wykorzystana tylko
-                  w celach identyficaji uczestników podczas konkursu. Dane
-                  logowania zostaną zapisane w pamięci lokalnej Twojej
-                  przeglądarki. Możesz w każdej chwili się wylogować lub usunąć
-                  konto.
-                </FormDescription>
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Hasło</FormLabel>
+                <FormControl>
+                  <Input {...field} type="password" />
+                </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />

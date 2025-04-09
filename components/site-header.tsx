@@ -2,6 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 
+import AdminLogoutButton from '@/components/admin/logout-button';
 import { MainNav, NavItem } from '@/components/main-nav';
 import ProfileMenu from '@/components/profile-menu';
 import ThemeToggle from '@/components/theme-toggle';
@@ -29,6 +30,7 @@ export default function SiteHeader() {
         <div className="flex flex-1 items-center justify-end space-x-4">
           <nav className="flex items-center space-x-2">
             {!isAdmin && <ProfileMenu />}
+            {isAdmin && <AdminLogoutButton />}
             <ThemeToggle />
           </nav>
         </div>
