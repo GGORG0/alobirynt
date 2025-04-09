@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { SendHorizontal } from 'lucide-react';
 import { useForm } from 'react-hook-form';
@@ -41,6 +41,9 @@ const formSchema = z.object({
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const nextUrl = searchParams.get('next') || '/';
+
   const { client: surreal, isSuccess, isLoggedIn } = useSurreal();
 
   const [isQuerying, setIsQuerying] = useState(true);
@@ -55,7 +58,7 @@ export default function LoginPage() {
 
     if (isLoggedIn) {
       console.log('User is already logged in!');
-      router.replace('/');
+      router.replace(nextUrl);
     }
 
     const detectLoggedIn = async () => {
@@ -63,7 +66,7 @@ export default function LoginPage() {
         const user = await surreal.info();
 
         console.log('User is already logged in:', user);
-        router.replace('/');
+        router.replace(nextUrl);
       } catch (err) {
         console.log('User is not logged in:', err);
 
@@ -72,7 +75,7 @@ export default function LoginPage() {
     };
 
     detectLoggedIn();
-  }, [surreal, router, isSuccess, isLoggedIn]);
+  }, [surreal, router, isSuccess, isLoggedIn, nextUrl]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -119,7 +122,7 @@ export default function LoginPage() {
 
         console.log('Logged in successfully as:', user);
         toast(`Zalogowano pomyślnie jako ${user.name}`);
-        router.replace('/');
+        router.replace(nextUrl);
       } catch (err) {
         // TODO: allow account transfer
         console.error('Error during signup:', err);
@@ -128,7 +131,7 @@ export default function LoginPage() {
         });
       }
     },
-    [isSuccess, surreal, setLoginInfo, router]
+    [isSuccess, surreal, setLoginInfo, router, nextUrl]
   );
 
   if (isQuerying) {

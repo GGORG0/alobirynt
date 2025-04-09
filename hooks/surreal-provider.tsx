@@ -8,7 +8,7 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useMutation } from '@tanstack/react-query';
 import { Surreal } from 'surrealdb';
 import { useLocalStorage } from 'usehooks-ts';
@@ -76,6 +76,20 @@ export function SurrealProvider({
   // Next Router instance for redirecting to the login page
   const router = useRouter();
 
+  // Path name and search params for the current URL used for redirecting to the login page
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const loginUrl = useMemo(() => {
+    if (pathname === '/login') return null;
+
+    const currentUrl =
+      pathname + (searchParams.toString() ? `?${searchParams.toString()}` : '');
+
+    const encodedUrl = encodeURIComponent(currentUrl);
+
+    return `/login?next=${encodedUrl}`;
+  }, [pathname, searchParams]);
+
   // React Query mutation for connecting to Surreal
   const {
     mutateAsync: connectMutation,
@@ -108,11 +122,12 @@ export function SurrealProvider({
 
   // Auto-login on connection success (if enabled)
   useEffect(() => {
-    if (!autoLogIn || !isSuccess || !surrealInstance) return;
+    if (!autoLogIn || !isSuccess || !surrealInstance || isLoggedIn || !loginUrl)
+      return;
 
     if (!loginInfo) {
       setIsLoggedIn(false);
-      router.push('/login');
+      router.push(loginUrl);
       return;
     }
 
@@ -141,12 +156,20 @@ export function SurrealProvider({
       } catch (err) {
         setIsLoggedIn(false);
         console.error('Auto login failed:', err);
-        router.push('/login');
+        router.push(loginUrl);
       }
     };
 
     autoLogin();
-  }, [autoLogIn, isSuccess, loginInfo, router, surrealInstance]);
+  }, [
+    autoLogIn,
+    isLoggedIn,
+    isSuccess,
+    loginInfo,
+    loginUrl,
+    router,
+    surrealInstance,
+  ]);
 
   // Memoize the context value
   const value: SurrealProviderState = useMemo(
