@@ -8,7 +8,7 @@ export default interface Submitted {
   in: RecordId;
   out: RecordId;
 
-  answer: string;
+  answer: number;
   correct: ReadOnly<boolean>;
   timestamp: ReadOnly<Date>;
 }
