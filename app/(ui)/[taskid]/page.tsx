@@ -52,7 +52,7 @@ export default function TaskPage({
   const [task, setTask] = useState<DiscoveredTask | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const [previousAnswer, setPreviousAnswer] = useState<number | null>(null);
+  const [previousAnswer, setPreviousAnswer] = useState<Submitted | null>(null);
 
   useEffect(() => {
     if (!surreal) return;
@@ -114,7 +114,7 @@ export default function TaskPage({
             console.log('Got previously submitted answer:', submitted);
 
             if (submitted) {
-              setPreviousAnswer(submitted.answer);
+              setPreviousAnswer(submitted);
             }
           } catch (err) {
             console.error('Failed to fetch submitted answer:', err);
@@ -209,9 +209,16 @@ export default function TaskPage({
                   <strong>{!task.solved && 'nie'}poprawna</strong>. Nie możesz
                   zmienić swojej odpowiedzi.
                 </span>
-                <div>
-                  Twoja odpowiedź: <strong>{previousAnswer}</strong>
-                </div>
+                {previousAnswer && (
+                  <div>
+                    Twoja odpowiedź:{' '}
+                    <strong>{previousAnswer.answer || 'Ładowanie...'}</strong>,{' '}
+                    przesłana:{' '}
+                    <strong>
+                      {previousAnswer.timestamp.toLocaleString('pl-PL')}
+                    </strong>
+                  </div>
+                )}
               </AlertDescription>
             </Alert>
           )}
