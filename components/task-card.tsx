@@ -12,14 +12,13 @@ import {
 
 import Task from '@/lib/models/task';
 import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
 import {
   Card,
   CardDescription,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-
-import { Badge } from './ui/badge';
 
 export interface TaskCardProps {
   task: Omit<Task, 'content' | 'answer_hash' | 'secret_hash'>;

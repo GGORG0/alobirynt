@@ -6,9 +6,8 @@ import { RotateCw } from 'lucide-react';
 
 import { fontMono } from '@/lib/fonts';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 import logo from '@/app/icon.svg';
-
-import { Button } from './ui/button';
 
 export interface ErrorScreenProps {
   error: Error & { digest?: string };

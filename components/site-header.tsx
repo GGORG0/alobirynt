@@ -2,10 +2,9 @@
 
 import { usePathname } from 'next/navigation';
 
+import { MainNav, NavItem } from '@/components/main-nav';
+import ProfileMenu from '@/components/profile-menu';
 import ThemeToggle from '@/components/theme-toggle';
-
-import { MainNav, NavItem } from './main-nav';
-import ProfileMenu from './profile-menu';
 
 const navItems: { admin: NavItem[]; public: NavItem[] } = {
   admin: [
@@ -29,7 +28,7 @@ export default function SiteHeader() {
         <MainNav items={items} admin={isAdmin} />
         <div className="flex flex-1 items-center justify-end space-x-4">
           <nav className="flex items-center space-x-2">
-            <ProfileMenu />
+            {!isAdmin && <ProfileMenu />}
             <ThemeToggle />
           </nav>
         </div>
