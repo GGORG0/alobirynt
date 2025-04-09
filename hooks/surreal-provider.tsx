@@ -8,7 +8,7 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useMutation } from '@tanstack/react-query';
 import { Surreal } from 'surrealdb';
 import { useLocalStorage } from 'usehooks-ts';
@@ -76,19 +76,15 @@ export function SurrealProvider({
   // Next Router instance for redirecting to the login page
   const router = useRouter();
 
-  // Path name and search params for the current URL used for redirecting to the login page
+  // Path name for the current URL used for redirecting to the login page
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const loginUrl = useMemo(() => {
     if (pathname === '/login') return null;
 
-    const currentUrl =
-      pathname + (searchParams.toString() ? `?${searchParams.toString()}` : '');
-
-    const encodedUrl = encodeURIComponent(currentUrl);
+    const encodedUrl = encodeURIComponent(pathname);
 
     return `/login?next=${encodedUrl}`;
-  }, [pathname, searchParams]);
+  }, [pathname]);
 
   // React Query mutation for connecting to Surreal
   const {

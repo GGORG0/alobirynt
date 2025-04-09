@@ -1,7 +1,6 @@
 'use client';
 
-import { use, useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { use, useEffect, useMemo, useState } from 'react';
 import { AlertCircle } from 'lucide-react';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -21,10 +20,12 @@ export default function TaskPage({
     taskid: string;
   }>;
 }) {
-  const { taskid: taskId } = use(params);
+  const { taskid: urlTaskId } = use(params);
 
-  const searchParams = useSearchParams();
-  const secret = searchParams.get('s');
+  const { taskId, secret } = useMemo(() => {
+    const parts = urlTaskId.split('-');
+    return { taskId: parts[0], secret: parts[1] };
+  }, [urlTaskId]);
 
   const surreal = useLoggedInSurrealClient();
 
