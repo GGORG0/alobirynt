@@ -5,7 +5,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertCircle, SendHorizontal } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import Markdown from 'react-markdown';
+import rehypeKatex from 'rehype-katex';
 import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
 import { toast } from 'sonner';
 import { RecordId } from 'surrealdb';
 import { z } from 'zod';
@@ -242,7 +244,12 @@ export default function TaskPage({
             <Badge>{task.points_solved} pkt</Badge>.
           </h2>
 
-          <Markdown remarkPlugins={[remarkGfm]}>{task.content}</Markdown>
+          <Markdown
+            remarkPlugins={[remarkGfm, remarkMath]}
+            rehypePlugins={[rehypeKatex]}
+          >
+            {task.content}
+          </Markdown>
 
           <Form {...form}>
             <form
