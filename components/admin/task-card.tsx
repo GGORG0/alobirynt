@@ -1,7 +1,13 @@
+import { Dispatch, SetStateAction, useCallback, useState } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { DialogTitle } from '@radix-ui/react-dialog';
-import { CheckCheck, Search } from 'lucide-react';
+import { CheckCheck, Save, Search } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import { z } from 'zod';
 
-import Task from '@/lib/models/task';
+import { AdminTask } from '@/lib/models/task';
+import { useLoggedInSurrealClient } from '@/hooks/surreal-provider';
 import { Badge } from '@/components/ui/badge';
 import {
   Card,
@@ -10,20 +16,82 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 
+import { Button } from '../ui/button';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTrigger,
 } from '../ui/dialog';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '../ui/form';
+import { Input } from '../ui/input';
+import { Label } from '../ui/label';
+import { Spinner } from '../ui/spinner';
+import { Textarea } from '../ui/textarea';
 
 export interface TaskCardProps {
-  task: Omit<Task, 'content' | 'answer_hash' | 'secret_hash'>;
+  task: AdminTask;
+  setRefetchTrigger: Dispatch<SetStateAction<boolean>>;
 }
 
-export default function AdminTaskCard({ task }: TaskCardProps) {
+const formSchema = z.object({
+  name: z.string(),
+  content: z.string(),
+  answer: z.coerce.number(),
+  points_discovered: z.coerce.number(),
+  points_solved: z.coerce.number(),
+});
+
+export default function AdminTaskCard({
+  task,
+  setRefetchTrigger,
+}: TaskCardProps) {
+  const surreal = useLoggedInSurrealClient();
+  const [open, setOpen] = useState<boolean>(false);
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: task.name,
+      content: task.content,
+      answer: task.answer,
+      points_discovered: task.points_discovered,
+      points_solved: task.points_solved,
+    },
+  });
+
+  const onSubmit = useCallback(
+    async (data: z.infer<typeof formSchema>) => {
+      console.log('Form submitted:', data);
+      if (!surreal) {
+        console.error('Surreal client is not initialized');
+        toast.error(
+          'Nie udało się edytować zadania: brak połączenia z bazą danych'
+        );
+        return;
+      }
+
+      await surreal.update(task.id, data);
+
+      console.log('Saved task data');
+      toast.success('Zapisano dane zadania');
+      setOpen(false);
+      setRefetchTrigger(true);
+    },
+    [setRefetchTrigger, surreal, task.id]
+  );
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Card className="cursor-pointer">
           <CardHeader>
@@ -44,6 +112,128 @@ export default function AdminTaskCard({ task }: TaskCardProps) {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{task.name}</DialogTitle>
+          <DialogDescription>
+            <div>
+              Liczba odkryć: <strong>{task.discover_count}</strong>
+            </div>
+            <div>
+              Liczba przesłanych rozwiązań: <strong>{task.answer_count}</strong>{' '}
+              (<strong>{task.solve_count}</strong> poprawnych)
+            </div>
+          </DialogDescription>
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center space-x-2">
+              <span className="flex-1">
+                <Label htmlFor="discoverurl">Adres odkrycia</Label>
+                <Input
+                  id="discoverurl"
+                  defaultValue={task.discover_url}
+                  readOnly
+                />
+              </span>
+              {/* <Button type="button">
+                <span className="sr-only">Kopiuj</span>
+                <Copy />
+              </Button> */}
+            </div>
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="flex flex-col gap-4"
+              >
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nazwa</FormLabel>
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="content"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Treść</FormLabel>
+                      <FormControl>
+                        <Textarea {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="answer"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Odpowiedź</FormLabel>
+                      <FormControl>
+                        <Input
+                          className="[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                          type="number"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="points_discovered"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Punkty za odkrycie</FormLabel>
+                      <FormControl>
+                        <Input
+                          className="[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                          type="number"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="points_solved"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Punkty za rozwiązanie</FormLabel>
+                      <FormControl>
+                        <Input
+                          className="[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                          type="number"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <DialogFooter>
+                  <Button type="submit" disabled={form.formState.isSubmitting}>
+                    Zapisz
+                    <span className="ml-1">
+                      {form.formState.isSubmitting ? (
+                        <Spinner size="small" />
+                      ) : (
+                        <Save />
+                      )}
+                    </span>
+                  </Button>
+                </DialogFooter>
+              </form>
+            </Form>
+          </div>
         </DialogHeader>
       </DialogContent>
     </Dialog>

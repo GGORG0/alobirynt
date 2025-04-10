@@ -33,3 +33,16 @@ export function isDiscovered(task: Task): task is DiscoveredTask {
 }
 
 export type WriteableTask = Writeable<Task>;
+
+export type AdminTask = Omit<
+  DiscoveredTask,
+  'discovered' | 'solved' | 'answered' | 'answer_hash' | 'secret_hash'
+> & {
+  answer: number;
+
+  // generated at query time
+  discover_url: ReadOnly<string>;
+  discover_count: ReadOnly<number>;
+  answer_count: ReadOnly<number>;
+  solve_count: ReadOnly<number>;
+};

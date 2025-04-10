@@ -28,7 +28,7 @@ export function MainNav({ items, admin }: MainNavProps) {
         </span>
       </Link>
       {items?.length ? (
-        <nav className="flex gap-6">
+        <nav className="flex gap-2">
           {items?.map(
             (item, index) =>
               item.href && (
