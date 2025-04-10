@@ -9,10 +9,14 @@ import LeaderboardUser, {
 } from '@/lib/models/leaderboard_user';
 import { useLoggedInSurrealClient } from '@/hooks/surreal-provider';
 import { DataTable } from '@/components/ui/data-table';
+import { Label } from '@/components/ui/label';
 
 export default function AdminLeaderboard() {
   const surreal = useLoggedInSurrealClient();
+
   const [data, setData] = useState<LeaderboardUser[]>([]);
+
+  const [refreshInterval, setRefreshInterval] = useState<number>(10000);
 
   useEffect(() => {
     if (!surreal) return;
@@ -32,7 +36,7 @@ export default function AdminLeaderboard() {
           FROM user
           WHERE count(->discovered) > 0
           ORDER BY points DESC
-          LIMIT 100;
+          LIMIT 50;
         `)
         )[0];
 
@@ -44,7 +48,7 @@ export default function AdminLeaderboard() {
 
       timeout = setTimeout(() => {
         fetchTasks();
-      }, 10000);
+      }, refreshInterval);
     };
 
     fetchTasks();
@@ -54,10 +58,29 @@ export default function AdminLeaderboard() {
         clearTimeout(timeout);
       }
     };
-  }, [surreal]);
+  }, [refreshInterval, surreal]);
 
   return (
-    <div className="container mx-auto py-10">
+    <div className="container mx-auto flex flex-col gap-4 py-10">
+      <h1 className="text-3xl font-bold">Tablica wyników</h1>
+      <div className="flex items-center gap-4">
+        <Label htmlFor="refresh-interval">
+          Częstotliwość odświeżania (sek):
+        </Label>
+        <input
+          type="number"
+          id="refresh-interval"
+          value={refreshInterval / 1000}
+          min={1}
+          onChange={(e) => {
+            const value = parseInt(e.target.value) * 1000;
+            if (!isNaN(value) && value >= 1000) {
+              setRefreshInterval(value);
+            }
+          }}
+          className="w-24 rounded border p-2"
+        />
+      </div>
       <DataTable columns={leaderboard_columns} data={data} />
     </div>
   );
