@@ -119,6 +119,9 @@
   body {
     @apply bg-background text-foreground;
   }
+  .katex-html {
+    @apply sr-only;
+  }
 }
 
 @utility container {
