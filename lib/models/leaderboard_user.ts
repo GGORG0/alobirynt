@@ -1,8 +1,6 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { RecordId } from 'surrealdb';
 
-import { DataTableColumnHeader } from '@/components/ui/data-table-column-header';
-
 import { ReadOnly } from '.';
 
 export default interface LeaderboardUser {
@@ -37,9 +35,4 @@ export const leaderboard_columns: ColumnDef<LeaderboardUser>[] = [
     accessorKey: 'discover_count',
     header: 'Odkrycia',
   },
-].map((it) => ({
-  ...it,
-  header: ({ column }) => (
-    <DataTableColumnHeader column={column} title={it.header} />
-  ),
-}));
+];

@@ -149,21 +149,15 @@ export default function AdminTaskCard({
             </div>
           </DialogDescription>
           <div className="flex flex-col gap-2">
-            <div className="flex items-center space-x-2">
-              <span className="flex-1">
-                <Label htmlFor="discoverurl" className="mb-2">
-                  Adres odkrycia
-                </Label>
-                <Input
-                  id="discoverurl"
-                  defaultValue={task.discover_url}
-                  readOnly
-                />
-              </span>
-              {/* <Button type="button">
-                <span className="sr-only">Kopiuj</span>
-                <Copy />
-              </Button> */}
+            <div>
+              <Label htmlFor="discoverurl" className="mb-2">
+                Adres odkrycia
+              </Label>
+              <Input
+                id="discoverurl"
+                defaultValue={task.discover_url}
+                readOnly
+              />
             </div>
 
             <Form {...form}>
