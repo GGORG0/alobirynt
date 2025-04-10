@@ -11,7 +11,7 @@ const navItems: { admin: NavItem[]; public: NavItem[] } = {
   admin: [
     { title: 'Główna', href: '/' },
     { title: 'Zadania', href: '/admin' },
-    { title: 'Uczestnicy', href: '/admin/users' },
+    { title: 'Wyniki', href: '/admin/leaderboard' },
   ],
   public: [{ title: 'Zadania', href: '/' }],
 };

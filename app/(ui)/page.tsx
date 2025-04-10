@@ -21,7 +21,7 @@ export default function Home() {
       try {
         const fetchedTasks = (
           await surreal.query<Extensible<Task>[][]>(
-            'SELECT * FROM task ORDER BY name'
+            'SELECT * FROM task ORDER BY name NUMERIC ASC'
           )
         )[0];
         setTasks(fetchedTasks);

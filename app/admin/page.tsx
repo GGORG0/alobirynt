@@ -25,7 +25,7 @@ SELECT
   count(<-submitted) AS answer_count,
   count(<-(submitted WHERE correct = true)) AS solve_count
 FROM task
-ORDER BY name
+ORDER BY name NUMERIC ASC
 `;
 
 export default function AdminTasks() {
