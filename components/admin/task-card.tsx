@@ -151,7 +151,9 @@ export default function AdminTaskCard({
           <div className="flex flex-col gap-2">
             <div className="flex items-center space-x-2">
               <span className="flex-1">
-                <Label htmlFor="discoverurl">Adres odkrycia</Label>
+                <Label htmlFor="discoverurl" className="mb-2">
+                  Adres odkrycia
+                </Label>
                 <Input
                   id="discoverurl"
                   defaultValue={task.discover_url}
@@ -163,6 +165,7 @@ export default function AdminTaskCard({
                 <Copy />
               </Button> */}
             </div>
+
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}

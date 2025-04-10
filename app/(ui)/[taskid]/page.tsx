@@ -244,12 +244,21 @@ export default function TaskPage({
             <Badge>{task.points_solved} pkt</Badge>.
           </h2>
 
-          <Markdown
-            remarkPlugins={[remarkGfm, remarkMath]}
-            rehypePlugins={[rehypeKatex]}
-          >
-            {task.content}
-          </Markdown>
+          <div>
+            <Markdown
+              remarkPlugins={[remarkGfm, remarkMath]}
+              rehypePlugins={[rehypeKatex]}
+              components={{
+                ul: ({ children, ...props }) => (
+                  <ul className="list-disc" {...props}>
+                    {children}
+                  </ul>
+                ),
+              }}
+            >
+              {task.content}
+            </Markdown>
+          </div>
 
           <Form {...form}>
             <form
