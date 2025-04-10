@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction, useCallback, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { DialogTitle } from '@radix-ui/react-dialog';
-import { CheckCheck, Save, Search } from 'lucide-react';
+import { CheckCheck, Save, Search, Trash2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -80,15 +80,42 @@ export default function AdminTaskCard({
         return;
       }
 
-      await surreal.update(task.id, data);
+      try {
+        await surreal.update(task.id, data);
 
-      console.log('Saved task data');
-      toast.success('Zapisano dane zadania');
-      setOpen(false);
-      setRefetchTrigger(true);
+        console.log('Saved task data');
+        toast.success('Zapisano dane zadania');
+        setOpen(false);
+        setRefetchTrigger(true);
+      } catch (err) {
+        console.error('Failed to save task data:', err);
+        toast.error('Nie udało się zapisać danych zadania');
+      }
     },
     [setRefetchTrigger, surreal, task.id]
   );
+
+  const deleteTask = useCallback(async () => {
+    if (!surreal) {
+      console.error('Surreal client is not initialized');
+      toast.error(
+        'Nie udało się usunąć zadania: brak połączenia z bazą danych'
+      );
+      return;
+    }
+
+    try {
+      await surreal.delete(task.id);
+
+      console.log('Deleted task');
+      toast.success('Usunięto zadanie');
+      setOpen(false);
+      setRefetchTrigger(true);
+    } catch (err) {
+      console.error('Failed to delete task:', err);
+      toast.error('Nie udało się usunąć zadania');
+    }
+  }, [setRefetchTrigger, surreal, task.id]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -220,7 +247,22 @@ export default function AdminTaskCard({
                 />
 
                 <DialogFooter>
-                  <Button type="submit" disabled={form.formState.isSubmitting}>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    onClick={deleteTask}
+                    className="cursor-pointer"
+                  >
+                    Usuń
+                    <span className="ml-1">
+                      <Trash2 />
+                    </span>
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={form.formState.isSubmitting}
+                    className="cursor-pointer"
+                  >
                     Zapisz
                     <span className="ml-1">
                       {form.formState.isSubmitting ? (
