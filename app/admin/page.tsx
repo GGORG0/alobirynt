@@ -1,11 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { Extensible } from '@/lib/models';
+import { Extensible, Writeable } from '@/lib/models';
 import { AdminTask } from '@/lib/models/task';
 import { useLoggedInSurrealClient } from '@/hooks/surreal-provider';
+import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import TaskCard from '@/components/admin/task-card';
 
@@ -56,8 +58,41 @@ export default function AdminTasks() {
     fetchTasks();
   }, [surreal, refetchTrigger]);
 
+  const newTask = useCallback(async () => {
+    if (!surreal) {
+      console.error('Surreal client is not initialized');
+      toast.error(
+        'Nie udało się dodać nowego zadania: brak połączenia z bazą danych'
+      );
+      return;
+    }
+
+    const newTask: Writeable<AdminTask> = {
+      name: '(Nowe zadanie)',
+      content: '',
+      points_discovered: 0,
+      points_solved: 0,
+      answer: 0,
+    };
+
+    try {
+      await surreal.create<AdminTask, Writeable<AdminTask>>('task', newTask);
+
+      console.log('Created new task');
+      toast.success('Dodano nowe zadanie');
+      setRefetchTrigger(true);
+    } catch (err) {
+      console.error('Failed to create new task:', err);
+      toast.error('Nie udało się dodać nowego zadania');
+    }
+  }, [surreal]);
+
   return (
     <div className="container flex flex-1 flex-col gap-4 py-8 md:gap-6">
+      <Button type="button" className="cursor-pointer" onClick={newTask}>
+        Nowe zadanie
+        <Plus />
+      </Button>
       {tasks.map((task) => (
         <TaskCard
           key={task.id.toString()}
