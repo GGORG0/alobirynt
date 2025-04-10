@@ -84,7 +84,7 @@ export default function AdminTaskCard({
         await surreal.update(task.id, data);
 
         console.log('Saved task data');
-        toast.success('Zapisano dane zadania');
+        toast.success(`Zapisano dane zadania ${task.name}`);
         setOpen(false);
         setRefetchTrigger(true);
       } catch (err) {
@@ -92,7 +92,7 @@ export default function AdminTaskCard({
         toast.error('Nie udało się zapisać danych zadania');
       }
     },
-    [setRefetchTrigger, surreal, task.id]
+    [setRefetchTrigger, surreal, task.id, task.name]
   );
 
   const deleteTask = useCallback(async () => {
