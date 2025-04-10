@@ -23,7 +23,7 @@ export function DataTablePagination<TData>({
   table,
 }: DataTablePaginationProps<TData>) {
   return (
-    <div className="flex items-center justify-end space-x-6 px-2 lg:space-x-8">
+    <div className="flex flex-col items-center justify-end gap-4 px-2 sm:flex-row sm:gap-6 lg:gap-8">
       <div className="flex items-center space-x-2">
         <p className="text-sm font-medium">Wierszy na stronę</p>
         <Select
