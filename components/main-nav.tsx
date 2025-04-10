@@ -6,6 +6,8 @@ import { ShieldUser } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import logo from '@/app/icon.svg';
 
+import { Button } from './ui/button';
+
 interface MainNavProps {
   items?: NavItem[];
   admin?: boolean;
@@ -30,15 +32,18 @@ export function MainNav({ items, admin }: MainNavProps) {
           {items?.map(
             (item, index) =>
               item.href && (
-                <Link
-                  key={index}
-                  href={item.href}
-                  className={cn(
-                    'text-muted-foreground flex items-center text-sm font-medium',
-                    item.disabled && 'cursor-not-allowed opacity-80'
-                  )}
-                >
-                  {item.title}
+                <Link key={index} href={item.href}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className={cn(
+                      item.disabled
+                        ? 'cursor-not-allowed opacity-80'
+                        : 'cursor-pointer'
+                    )}
+                  >
+                    {item.title}
+                  </Button>
                 </Link>
               )
           )}

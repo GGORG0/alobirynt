@@ -209,15 +209,17 @@ export default function TaskPage({
       )}
       {task && (
         <>
-          {task.answered && (
+          {(task.answered || previousAnswer) && (
             <Alert>
               <AlertCircle className="h-4 w-4" />
               <AlertTitle>Już odpowiedziałeś na to zadanie!</AlertTitle>
               <AlertDescription>
                 <span>
                   Twoja odpowiedź była{' '}
-                  <strong>{!task.solved && 'nie'}poprawna</strong>. Nie możesz
-                  już jej zmienić.
+                  <strong>
+                    {!(task.solved || previousAnswer?.correct) && 'nie'}poprawna
+                  </strong>
+                  . Nie możesz już jej zmienić.
                 </span>
                 {previousAnswer && (
                   <div>
@@ -255,6 +257,7 @@ export default function TaskPage({
                     <FormLabel>Odpowiedź</FormLabel>
                     <FormControl>
                       <Input
+                        disabled={task.answered || previousAnswer !== null}
                         className="[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
                         type="number"
                         placeholder="Wpisz odpowiedź"

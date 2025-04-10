@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { cva } from 'class-variance-authority';
 import {
@@ -9,6 +10,7 @@ import {
   Search,
   X,
 } from 'lucide-react';
+import { toast } from 'sonner';
 
 import Task from '@/lib/models/task';
 import { cn } from '@/lib/utils';
@@ -50,16 +52,20 @@ export default function TaskCard({ task }: TaskCardProps) {
     className: 'scale-140',
   };
 
+  const onClick = useCallback(() => {
+    if (task.discovered) {
+      router.push(`/${task.id.id.toString()}`);
+    } else {
+      toast.warning('Nie odkryto jeszcze tego zadania! Szukaj dalej!');
+    }
+  }, [router, task.discovered, task.id.id]);
+
   return (
     <Card
-      onClick={
-        task.discovered
-          ? () => {
-              router.push(`/${task.id.id.toString()}`);
-            }
-          : undefined
-      }
-      className={cn(task.discovered && 'cursor-pointer')}
+      onClick={onClick}
+      className={cn(
+        task.discovered ? 'cursor-pointer' : 'cursor-not-allowed opacity-80'
+      )}
     >
       <CardHeader className="relative">
         <CardTitle>{task.name}</CardTitle>
