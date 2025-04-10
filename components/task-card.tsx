@@ -56,7 +56,7 @@ export default function TaskCard({ task }: TaskCardProps) {
     if (task.discovered) {
       router.push(`/${task.id.id.toString()}`);
     } else {
-      toast.warning('Nie odkryto jeszcze tego zadania! Szukaj dalej!');
+      toast.warning('Nie odkryłeś jeszcze tego zadania! Szukaj dalej!');
     }
   }, [router, task.discovered, task.id.id]);
 
