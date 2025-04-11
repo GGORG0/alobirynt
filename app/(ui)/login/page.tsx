@@ -138,7 +138,7 @@ export default function LoginPage() {
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-8">
-      <h1 className="text-2xl">Zaloguj się</h1>
+      <h1 className="text-2xl">Stwórz konto</h1>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -167,7 +167,7 @@ export default function LoginPage() {
             )}
           />
           <Button type="submit" disabled={form.formState.isSubmitting}>
-            Zaloguj się
+            Rozpocznij grę
             <span className="ml-1">
               {form.formState.isSubmitting ? (
                 <Spinner size="small" />
